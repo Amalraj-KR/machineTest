@@ -195,16 +195,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         return Container(
           width: double.infinity,
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF3B82F6), // Bright blue
-                Color(0xFF10B981), // Emerald green
-                Color(0xFF8B5CF6), // Purple
-              ],
-              stops: [0.0, 0.6, 1.0],
-            ),
+            color: Color(0xFF3B82F6), // Bright blue
             borderRadius: BorderRadius.only(
               topRight: Radius.circular(24),
               bottomLeft: Radius.circular(32),

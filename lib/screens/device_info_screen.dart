@@ -151,14 +151,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF3B82F6), // Bright blue
-            Color(0xFF8B5CF6), // Purple
-          ],
-        ),
+        color: const Color(0xFF3B82F6), // Bright blue
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(

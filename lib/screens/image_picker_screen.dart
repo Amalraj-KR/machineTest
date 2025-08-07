@@ -44,14 +44,7 @@ class ImagePickerScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF10B981), // Emerald green
-            Color(0xFF059669), // Darker emerald
-          ],
-        ),
+        color: const Color(0xFF10B981), // Emerald green
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
