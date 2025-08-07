@@ -19,19 +19,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late AnimationController _animationController;
 
   final List<Widget> _screens = [
-    const RecipesScreen(),
     const ProfileScreen(),
     const DeviceInfoScreen(),
     const ImagePickerScreen(),
+    const RecipesScreen(),
   ];
 
   final List<NavItem> _navItems = [
-    NavItem(
-      icon: Icons.restaurant_menu_outlined,
-      activeIcon: Icons.restaurant_menu_rounded,
-      label: 'Recipes',
-      title: 'Recipe Collection',
-    ),
     NavItem(
       icon: Icons.person_outline_rounded,
       activeIcon: Icons.person_rounded,
@@ -49,6 +43,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       activeIcon: Icons.image_rounded,
       label: 'Gallery',
       title: 'Pick & Display Image',
+    ),
+    NavItem(
+      icon: Icons.restaurant_menu_outlined,
+      activeIcon: Icons.restaurant_menu_rounded,
+      label: 'Recipes',
+      title: 'Recipe Collection',
     ),
   ];
 
