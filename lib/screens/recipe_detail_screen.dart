@@ -196,6 +196,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
           children: [
             Hero(
               tag: 'recipe-image-${_recipe!.id}',
+
               child: Image.network(
                 _recipe!.image,
                 fit: BoxFit.cover,
