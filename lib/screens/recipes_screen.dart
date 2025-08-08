@@ -50,12 +50,10 @@ class _RecipesScreenState extends State<RecipesScreen> {
       builder: (context, recipeProvider, child) {
         return Column(
           children: [
-            // Search and filters
             Container(
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // Search bar
                   TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
@@ -75,7 +73,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  // Filter row
+
                   Row(
                     children: [
                       Expanded(
@@ -111,7 +109,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                 ],
               ),
             ),
-            // Recipes list
+
             Expanded(child: _buildRecipesList(recipeProvider)),
           ],
         );
@@ -170,12 +168,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
 
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.fromLTRB(
-        16,
-        0,
-        16,
-        48,
-      ), // Bottom padding for battery overlay
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 48),
       itemCount:
           recipeProvider.recipes.length +
           (recipeProvider.hasMoreRecipes ? 1 : 0),
@@ -363,7 +356,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
   }
 
   void _showFiltersDialog(BuildContext context) {
-    // Create temporary filter states
     final tempSelectedTags = List<String>.from(
       context.read<RecipeProvider>().selectedTags,
     );
@@ -456,7 +448,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // Apply the temporary filters to the actual provider
                   final provider = context.read<RecipeProvider>();
                   provider.applyFilters(
                     tempSelectedTags,

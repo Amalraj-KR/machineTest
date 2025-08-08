@@ -9,7 +9,6 @@ import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 
 void main() {
-  // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -48,12 +47,11 @@ class MyApp extends StatelessWidget {
   }
 
   ThemeData _buildTheme() {
-    // Modern color palette - Deep Ocean & Sunset
-    const primaryColor = Color(0xFF0F172A); // Deep slate
-    const secondaryColor = Color(0xFF3B82F6); // Bright blue
-    const tertiaryColor = Color(0xFFFF6B6B); // Coral red
-    const accentColor = Color(0xFF10B981); // Emerald green
-    const surfaceColor = Color(0xFFFBFBFB); // Pure white
+    const primaryColor = Color(0xFF0F172A);
+    const secondaryColor = Color(0xFF3B82F6);
+    const tertiaryColor = Color(0xFFFF6B6B);
+    const accentColor = Color(0xFF10B981);
+    const surfaceColor = Color(0xFFFBFBFB);
 
     return ThemeData(
       useMaterial3: true,
@@ -180,7 +178,7 @@ class MyApp extends StatelessWidget {
         thickness: 1,
         space: 1,
       ),
-      // Add modern text theme
+
       textTheme: TextTheme(
         headlineLarge: TextStyle(
           fontSize: 32,
@@ -231,7 +229,6 @@ class AppRouter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
-        // Show splash screen for a brief moment, then navigate based on auth state
         return FutureBuilder(
           future: Future.delayed(const Duration(seconds: 4)),
           builder: (context, snapshot) {
@@ -239,7 +236,6 @@ class AppRouter extends StatelessWidget {
               return const SplashScreen();
             }
 
-            // After splash screen, check auth state
             if (authProvider.isLoggedIn) {
               return const HomeScreen();
             } else {

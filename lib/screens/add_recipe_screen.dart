@@ -75,24 +75,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            child: ElevatedButton.icon(
-              onPressed: _saveRecipe,
-              icon: const Icon(Icons.save_rounded, size: 18),
-              label: const Text('Save'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF3B82F6),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
       body: Form(
         key: _formKey,

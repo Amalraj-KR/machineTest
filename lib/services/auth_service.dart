@@ -33,7 +33,7 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        // Add the token back to the response since /auth/me doesn't return it
+
         data['accessToken'] = token;
         return User.fromJson(data);
       } else {

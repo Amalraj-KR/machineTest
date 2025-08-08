@@ -44,7 +44,6 @@ class AuthProvider with ChangeNotifier {
         await _saveUserToPrefs();
         notifyListeners();
       } catch (e) {
-        // Token might be expired, try refresh
         if (_user?.refreshToken != null) {
           try {
             final refreshedUser = await AuthService.refreshToken(

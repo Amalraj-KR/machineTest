@@ -9,7 +9,6 @@ class User {
   final String accessToken;
   final String refreshToken;
 
-  // Getter for backwards compatibility
   String get token => accessToken;
 
   User({

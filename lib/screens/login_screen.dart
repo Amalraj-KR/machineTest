@@ -80,7 +80,6 @@ class _LoginScreenState extends State<LoginScreen>
                   children: [
                     const SizedBox(height: 60),
 
-                    // Animated Logo and Title
                     FadeTransition(
                       opacity: _fadeAnimation,
                       child: SlideTransition(
@@ -134,7 +133,6 @@ class _LoginScreenState extends State<LoginScreen>
 
                     const SizedBox(height: 48),
 
-                    // Login Form
                     FadeTransition(
                       opacity: _fadeAnimation,
                       child: SlideTransition(
@@ -154,7 +152,6 @@ class _LoginScreenState extends State<LoginScreen>
                           padding: const EdgeInsets.all(32),
                           child: Column(
                             children: [
-                              // Username Field
                               TextFormField(
                                 controller: _usernameController,
                                 decoration: const InputDecoration(
@@ -173,7 +170,6 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                               const SizedBox(height: 20),
 
-                              // Password Field
                               TextFormField(
                                 controller: _passwordController,
                                 obscureText: _obscurePassword,
@@ -205,7 +201,6 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                               const SizedBox(height: 32),
 
-                              // Login Button
                               Consumer<AuthProvider>(
                                 builder: (context, authProvider, child) {
                                   if (authProvider.error != null) {
@@ -290,7 +285,6 @@ class _LoginScreenState extends State<LoginScreen>
 
                     const SizedBox(height: 32),
 
-                    // Demo Credentials Card
                     FadeTransition(
                       opacity: _fadeAnimation,
                       child: SlideTransition(
@@ -331,9 +325,66 @@ class _LoginScreenState extends State<LoginScreen>
                                 ],
                               ),
                               const SizedBox(height: 12),
-                              _buildCredentialRow('Username:', 'emilys'),
+
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 80,
+                                    child: Text(
+                                      "Username",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withValues(alpha: 0.6),
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    "emilys",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      fontFamily: 'monospace',
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
                               const SizedBox(height: 4),
-                              _buildCredentialRow('Password:', 'emilyspass'),
+
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 80,
+                                    child: Text(
+                                      "Password",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withValues(alpha: 0.6),
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    "emilyspass",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      fontFamily: 'monospace',
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -346,34 +397,6 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildCredentialRow(String label, String value) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 80,
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'monospace',
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-      ],
     );
   }
 

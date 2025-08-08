@@ -41,7 +41,6 @@ class PlatformProvider with ChangeNotifier {
         notifyListeners();
       },
       onError: (error) {
-        // Battery stream error, fallback to periodic updates
         _startBatteryPolling();
       },
     );
@@ -57,9 +56,7 @@ class PlatformProvider with ChangeNotifier {
     try {
       _batteryLevel = await PlatformService.getCurrentBatteryLevel();
       notifyListeners();
-    } catch (e) {
-      // Battery level not critical, fail silently
-    }
+    } catch (e) {}
   }
 
   Future<void> _loadAppInfo() async {
@@ -80,7 +77,6 @@ class PlatformProvider with ChangeNotifier {
       }
       notifyListeners();
     } catch (e) {
-      // Fallback to default values if pubspec.yaml cannot be read
       _appName = 'Machine Test';
       _appVersion = '1.0.0';
       _buildNumber = '1';

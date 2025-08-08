@@ -70,13 +70,13 @@ class BatteryOverlay extends StatelessWidget {
 
   Color _getBatteryColor(int level) {
     if (level <= 15) {
-      return const Color(0xFFEF4444); // Red
+      return const Color(0xFFEF4444);
     } else if (level <= 30) {
-      return const Color(0xFFF97316); // Orange
+      return const Color(0xFFF97316);
     } else if (level <= 50) {
-      return const Color(0xFFF59E0B); // Amber
+      return const Color(0xFFF59E0B);
     } else {
-      return const Color(0xFF10B981); // Green
+      return const Color(0xFF10B981);
     }
   }
 

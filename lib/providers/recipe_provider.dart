@@ -81,9 +81,7 @@ class RecipeProvider with ChangeNotifier {
     try {
       _availableTags = await RecipeService.getRecipeTags();
       notifyListeners();
-    } catch (e) {
-      // Tags are not critical, fail silently
-    }
+    } catch (e) {}
   }
 
   void searchRecipes(String query) {
@@ -116,7 +114,7 @@ class RecipeProvider with ChangeNotifier {
     _selectedTags.clear();
     _selectedMealTypes.clear();
     _searchQuery = '';
-    // Fetch all recipes again when clearing filters
+
     _currentPage = 0;
     fetchRecipes();
   }
@@ -127,11 +125,9 @@ class RecipeProvider with ChangeNotifier {
     _selectedMealTypes.clear();
     _selectedMealTypes.addAll(mealTypes);
 
-    // If we have tag filters, fetch recipes by tag from API
     if (_selectedTags.isNotEmpty) {
       _fetchRecipesByFilters();
     } else {
-      // If no tag filters, just apply local filtering
       _applyFilters();
       notifyListeners();
     }
@@ -151,7 +147,6 @@ class RecipeProvider with ChangeNotifier {
       List<Recipe> allTaggedRecipes = [];
       Set<int> uniqueRecipeIds = {};
 
-      // Fetch recipes for each selected tag and combine them
       for (String tag in _selectedTags) {
         final result = await RecipeService.getRecipesByTag(
           tag: tag,
@@ -161,7 +156,6 @@ class RecipeProvider with ChangeNotifier {
 
         final tagRecipes = result['recipes'] as List<Recipe>;
 
-        // Add recipes that we haven't seen yet (avoid duplicates)
         for (Recipe recipe in tagRecipes) {
           if (!uniqueRecipeIds.contains(recipe.id)) {
             uniqueRecipeIds.add(recipe.id);
@@ -172,11 +166,9 @@ class RecipeProvider with ChangeNotifier {
 
       _recipes = allTaggedRecipes;
       _totalRecipes = _recipes.length;
-      _hasMoreRecipes =
-          false; // For multi-tag filtering, disable pagination for now
+      _hasMoreRecipes = false;
       _currentPage++;
 
-      // Apply meal type and search filters locally on the combined API results
       _applyFilters();
       await _saveRecipesToPrefs();
       _error = null;
@@ -190,7 +182,6 @@ class RecipeProvider with ChangeNotifier {
 
   void _applyFilters() {
     _filteredRecipes = _recipes.where((recipe) {
-      // For meal types and search, always apply local filtering
       bool matchesMealTypes =
           _selectedMealTypes.isEmpty ||
           _selectedMealTypes.any(
@@ -205,13 +196,8 @@ class RecipeProvider with ChangeNotifier {
                 ingredient.toLowerCase().contains(_searchQuery.toLowerCase()),
           );
 
-      // For tags: if we have selected tags and used API filtering,
-      // the recipes already match the tags (OR logic)
-      // If no tags selected or we're using cached data, apply tag filter locally
       bool matchesTags = true;
       if (_selectedTags.isNotEmpty) {
-        // Check if we fetched these recipes via tag API
-        // If so, they already match at least one of our selected tags
         matchesTags = _selectedTags.any((tag) => recipe.tags.contains(tag));
       }
 
@@ -268,9 +254,7 @@ class RecipeProvider with ChangeNotifier {
         _recipes = recipesList.map((json) => Recipe.fromJson(json)).toList();
         _applyFilters();
         notifyListeners();
-      } catch (e) {
-        // Failed to load from prefs, will fetch from API
-      }
+      } catch (e) {}
     }
   }
 
@@ -279,7 +263,6 @@ class RecipeProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Get unique meal types from all recipes
   Set<String> get availableMealTypes {
     final mealTypes = <String>{};
     for (final recipe in _recipes) {

@@ -25,7 +25,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
   late TextEditingController _caloriesController;
   Recipe? _recipe;
 
-  // Dynamic lists for ingredients and instructions
   final List<TextEditingController> _ingredientControllers = [];
   final List<TextEditingController> _instructionControllers = [];
 
@@ -61,7 +60,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
       text: _recipe?.caloriesPerServing.toString() ?? '',
     );
 
-    // Initialize dynamic controllers
     _setupIngredientControllers();
     _setupInstructionControllers();
   }
@@ -73,7 +71,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
         _ingredientControllers.add(TextEditingController(text: ingredient));
       }
     }
-    // Always have at least one empty field
+
     if (_ingredientControllers.isEmpty) {
       _ingredientControllers.add(TextEditingController());
     }
@@ -86,7 +84,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
         _instructionControllers.add(TextEditingController(text: instruction));
       }
     }
-    // Always have at least one empty field
+
     if (_instructionControllers.isEmpty) {
       _instructionControllers.add(TextEditingController());
     }
@@ -104,7 +102,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     _cuisineController.dispose();
     _caloriesController.dispose();
 
-    // Dispose dynamic controllers
     for (var controller in _ingredientControllers) {
       controller.dispose();
     }
@@ -122,7 +119,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
           title: const Text('Recipe Not Found'),
-          backgroundColor: Colors.transparent,
+          backgroundColor: Colors.blue,
           elevation: 0,
         ),
         body: Center(
@@ -167,14 +164,183 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
-          _buildSliverAppBar(context),
+          SliverAppBar(
+            expandedHeight: 300,
+            pinned: true,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Hero(
+                    tag: 'recipe-image-${_recipe!.id}',
+
+                    child: Image.network(
+                      _recipe!.image,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey.shade200,
+                          child: const Icon(
+                            Icons.restaurant_menu_rounded,
+                            size: 64,
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.7),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            leading: Container(
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.9),
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_rounded,
+                  color: Colors.black87,
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ),
           SliverToBoxAdapter(
             child: Column(
               children: [
-                _buildHeaderInfo(context),
-                _buildQuickStats(context),
-                _buildDetailsSection(context),
-                const SizedBox(height: 100), // Space for battery overlay
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_isEditing)
+                        _customTextField(
+                          label: 'Recipe Name',
+                          controller: _nameController,
+                          icon: Icons.restaurant_menu_rounded,
+                        )
+                      else
+                        Text(
+                          _recipe!.name,
+                          style: Theme.of(context).textTheme.headlineMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF0F172A),
+                              ),
+                        ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          _buildRatingChip(_recipe!.rating),
+                          const SizedBox(width: 12),
+                          _buildChip(
+                            icon: Icons.schedule_rounded,
+                            label:
+                                '${_recipe!.prepTimeMinutes + _recipe!.cookTimeMinutes} min',
+                            color: const Color(0xFF3B82F6),
+                          ),
+                          const SizedBox(width: 12),
+                          _buildChip(
+                            icon: Icons.local_fire_department_rounded,
+                            label: '${_recipe!.caloriesPerServing} cal',
+                            color: const Color(0xFFFF6B6B),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                Container(
+                  margin: const EdgeInsets.only(top: 24),
+                  child: Column(
+                    children: [
+                      _buildSectionCard(
+                        title: 'Recipe Details',
+                        icon: Icons.info_outline_rounded,
+                        color: const Color(0xFF3B82F6),
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildInfoField(
+                                  label: 'Cuisine',
+                                  controller: _cuisineController,
+                                  icon: Icons.public_rounded,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: _buildInfoField(
+                                  label: 'Calories/Serving',
+                                  controller: _caloriesController,
+                                  icon: Icons.local_fire_department_rounded,
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      _buildSectionCard(
+                        title: 'Tags & Categories',
+                        icon: Icons.label_outline_rounded,
+                        color: const Color(0xFF10B981),
+                        children: [
+                          _buildTagsSection(),
+                          const SizedBox(height: 16),
+                          _buildMealTypesSection(),
+                        ],
+                      ),
+                      _buildSectionCard(
+                        title: 'Ingredients',
+                        icon: Icons.shopping_basket_outlined,
+                        color: const Color(0xFF8B5CF6),
+                        children: [
+                          _buildListField(
+                            controller: _ingredientsController,
+                            items: _recipe!.ingredients,
+                            hintText: _isEditing
+                                ? 'Enter each ingredient on a new line'
+                                : null,
+                          ),
+                        ],
+                      ),
+                      _buildSectionCard(
+                        title: 'Instructions',
+                        icon: Icons.format_list_numbered_rounded,
+                        color: const Color(0xFFFF6B6B),
+                        children: [
+                          _buildListField(
+                            controller: _instructionsController,
+                            items: _recipe!.instructions,
+                            hintText: _isEditing
+                                ? 'Enter each step on a new line'
+                                : null,
+                            isNumbered: true,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 100),
               ],
             ),
           ),
@@ -184,230 +350,55 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     );
   }
 
-  Widget _buildSliverAppBar(BuildContext context) {
-    return SliverAppBar(
-      expandedHeight: 300,
-      pinned: true,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Stack(
-          fit: StackFit.expand,
-          children: [
-            Hero(
-              tag: 'recipe-image-${_recipe!.id}',
-
-              child: Image.network(
-                _recipe!.image,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey.shade200,
-                    child: const Icon(
-                      Icons.restaurant_menu_rounded,
-                      size: 64,
-                      color: Colors.grey,
-                    ),
-                  );
-                },
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withValues(alpha: 0.7),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      leading: Container(
-        margin: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.9),
-          shape: BoxShape.circle,
-        ),
-        child: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.black87),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeaderInfo(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (_isEditing)
-            _buildModernTextField(
-              label: 'Recipe Name',
-              controller: _nameController,
-              icon: Icons.restaurant_menu_rounded,
-            )
-          else
-            Text(
-              _recipe!.name,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF0F172A),
-              ),
-            ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              _buildRatingChip(_recipe!.rating),
-              const SizedBox(width: 12),
-              _buildChip(
-                icon: Icons.schedule_rounded,
-                label:
-                    '${_recipe!.prepTimeMinutes + _recipe!.cookTimeMinutes} min',
-                color: const Color(0xFF3B82F6),
-              ),
-              const SizedBox(width: 12),
-              _buildChip(
-                icon: Icons.local_fire_department_rounded,
-                label: '${_recipe!.caloriesPerServing} cal',
-                color: const Color(0xFFFF6B6B),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickStats(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildStatCard(
-              icon: Icons.timer_outlined,
-              title: 'Prep',
-              value: '${_recipe!.prepTimeMinutes}m',
-              color: const Color(0xFF10B981),
-              controller: _prepTimeController,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildStatCard(
-              icon: Icons.local_fire_department_outlined,
-              title: 'Cook',
-              value: '${_recipe!.cookTimeMinutes}m',
-              color: const Color(0xFFFF6B6B),
-              controller: _cookTimeController,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildStatCard(
-              icon: Icons.people_outline_rounded,
-              title: 'Serves',
-              value: '${_recipe!.servings}',
-              color: const Color(0xFF8B5CF6),
-              controller: _servingsController,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildStatCard(
-              icon: Icons.speed_rounded,
-              title: 'Difficulty',
-              value: _recipe!.difficulty,
-              color: const Color(0xFF3B82F6),
-              controller: _difficultyController,
-              isText: true,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailsSection(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 24),
-      child: Column(
-        children: [
-          _buildSectionCard(
-            title: 'Recipe Details',
-            icon: Icons.info_outline_rounded,
-            color: const Color(0xFF3B82F6),
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildInfoField(
-                      label: 'Cuisine',
-                      controller: _cuisineController,
-                      icon: Icons.public_rounded,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildInfoField(
-                      label: 'Calories/Serving',
-                      controller: _caloriesController,
-                      icon: Icons.local_fire_department_rounded,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          _buildSectionCard(
-            title: 'Tags & Categories',
-            icon: Icons.label_outline_rounded,
-            color: const Color(0xFF10B981),
-            children: [
-              _buildTagsSection(),
-              const SizedBox(height: 16),
-              _buildMealTypesSection(),
-            ],
-          ),
-          _buildSectionCard(
-            title: 'Ingredients',
-            icon: Icons.shopping_basket_outlined,
-            color: const Color(0xFF8B5CF6),
-            children: [
-              _buildListField(
-                controller: _ingredientsController,
-                items: _recipe!.ingredients,
-                hintText: _isEditing
-                    ? 'Enter each ingredient on a new line'
-                    : null,
-              ),
-            ],
-          ),
-          _buildSectionCard(
-            title: 'Instructions',
-            icon: Icons.format_list_numbered_rounded,
-            color: const Color(0xFFFF6B6B),
-            children: [
-              _buildListField(
-                controller: _instructionsController,
-                items: _recipe!.instructions,
-                hintText: _isEditing ? 'Enter each step on a new line' : null,
-                isNumbered: true,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildQuickStats(BuildContext context) {
+  //   return Container(
+  //     margin: const EdgeInsets.symmetric(horizontal: 20),
+  //     child: Row(
+  //       children: [
+  //         Expanded(
+  //           child: _buildStatCard(
+  //             icon: Icons.timer_outlined,
+  //             title: 'Prep',
+  //             value: '${_recipe!.prepTimeMinutes}m',
+  //             color: const Color(0xFF10B981),
+  //             controller: _prepTimeController,
+  //           ),
+  //         ),
+  //         const SizedBox(width: 12),
+  //         Expanded(
+  //           child: _buildStatCard(
+  //             icon: Icons.local_fire_department_outlined,
+  //             title: 'Cook',
+  //             value: '${_recipe!.cookTimeMinutes}m',
+  //             color: const Color(0xFFFF6B6B),
+  //             controller: _cookTimeController,
+  //           ),
+  //         ),
+  //         const SizedBox(width: 12),
+  //         Expanded(
+  //           child: _buildStatCard(
+  //             icon: Icons.people_outline_rounded,
+  //             title: 'Serves',
+  //             value: '${_recipe!.servings}',
+  //             color: const Color(0xFF8B5CF6),
+  //             controller: _servingsController,
+  //           ),
+  //         ),
+  //         const SizedBox(width: 12),
+  //         Expanded(
+  //           child: _buildStatCard(
+  //             icon: Icons.speed_rounded,
+  //             title: 'Difficulty',
+  //             value: _recipe!.difficulty,
+  //             color: const Color(0xFF3B82F6),
+  //             controller: _difficultyController,
+  //             isText: true,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildFloatingActionButton(BuildContext context) {
     return FloatingActionButton.extended(
@@ -421,7 +412,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     );
   }
 
-  Widget _buildModernTextField({
+  Widget _customTextField({
     required String label,
     required TextEditingController controller,
     required IconData icon,
@@ -799,16 +790,14 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     String? hintText,
     bool isNumbered = false,
   }) {
-    // For ingredients section
     if (hintText?.contains('ingredient') == true) {
       return _buildDynamicIngredientsList();
     }
-    // For instructions section
+
     if (hintText?.contains('step') == true) {
       return _buildDynamicInstructionsList();
     }
 
-    // Fallback for other cases
     if (_isEditing) {
       return TextField(
         controller: controller,
@@ -890,7 +879,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     if (!_isEditing) {
       return Column(
         children: _recipe!.ingredients.asMap().entries.map((entry) {
-          // final index = entry.key;
           final item = entry.value;
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
@@ -1159,7 +1147,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     if (_isEditing) {
       _saveChanges();
     } else {
-      // When entering edit mode, refresh the dynamic controllers
       _setupIngredientControllers();
       _setupInstructionControllers();
     }
@@ -1170,13 +1157,11 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
 
   void _saveChanges() {
     try {
-      // Collect ingredients from dynamic controllers
       final ingredients = _ingredientControllers
           .map((controller) => controller.text.trim())
           .where((text) => text.isNotEmpty)
           .toList();
 
-      // Collect instructions from dynamic controllers
       final instructions = _instructionControllers
           .map((controller) => controller.text.trim())
           .where((text) => text.isNotEmpty)
@@ -1201,7 +1186,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
       context.read<RecipeProvider>().updateRecipe(updatedRecipe);
       _recipe = updatedRecipe;
 
-      // Update the old controllers for backward compatibility
       _ingredientsController.text = ingredients.join('\n');
       _instructionsController.text = instructions.join('\n');
 
