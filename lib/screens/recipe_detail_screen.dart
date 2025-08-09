@@ -261,49 +261,79 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
               children: [
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          icon: Icons.timer_outlined,
-                          title: 'Prep',
-                          value: '${_recipe!.prepTimeMinutes}m',
-                          color: const Color(0xFF10B981),
-                          controller: _prepTimeController,
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade200),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          icon: Icons.local_fire_department_outlined,
-                          title: 'Cook',
-                          value: '${_recipe!.cookTimeMinutes}m',
-                          color: const Color(0xFFFF6B6B),
-                          controller: _cookTimeController,
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _buildStatItem(
+                            icon: Icons.timer_outlined,
+                            title: 'Prep',
+                            value: '${_recipe!.prepTimeMinutes}m',
+                            color: const Color(0xFF10B981),
+                            controller: _prepTimeController,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          icon: Icons.people_outline_rounded,
-                          title: 'Serves',
-                          value: '${_recipe!.servings}',
-                          color: const Color(0xFF8B5CF6),
-                          controller: _servingsController,
+                        Container(
+                          width: 1,
+                          height: 40,
+                          color: Colors.grey.shade200,
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          icon: Icons.speed_rounded,
-                          title: 'Difficulty',
-                          value: _recipe!.difficulty,
-                          color: const Color(0xFF3B82F6),
-                          controller: _difficultyController,
-                          isText: true,
+                        Expanded(
+                          child: _buildStatItem(
+                            icon: Icons.local_fire_department_outlined,
+                            title: 'Cook',
+                            value: '${_recipe!.cookTimeMinutes}m',
+                            color: const Color(0xFFFF6B6B),
+                            controller: _cookTimeController,
+                          ),
                         ),
-                      ),
-                    ],
+                        Container(
+                          width: 1,
+                          height: 40,
+                          color: Colors.grey.shade200,
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                        ),
+                        Expanded(
+                          child: _buildStatItem(
+                            icon: Icons.people_outline_rounded,
+                            title: 'Serves',
+                            value: '${_recipe!.servings}',
+                            color: const Color(0xFF8B5CF6),
+                            controller: _servingsController,
+                          ),
+                        ),
+                        Container(
+                          width: 1,
+                          height: 40,
+                          color: Colors.grey.shade200,
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                        ),
+                        Expanded(
+                          child: _buildStatItem(
+                            icon: Icons.speed_rounded,
+                            title: 'Difficulty',
+                            value: _recipe!.difficulty,
+                            color: const Color(0xFF3B82F6),
+                            controller: _difficultyController,
+                            isText: true,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 
@@ -614,7 +644,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     );
   }
 
-  Widget _buildStatCard({
+  Widget _buildStatItem({
     required IconData icon,
     required String title,
     required String value,
@@ -622,64 +652,48 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     required TextEditingController controller,
     bool isText = false,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 20),
+        const SizedBox(height: 6),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 11,
+            color: Colors.grey.shade600,
+            fontWeight: FontWeight.w500,
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 4),
-          if (_isEditing)
-            SizedBox(
-              width: double.infinity,
-              child: TextField(
-                controller: controller,
-                keyboardType: isText
-                    ? TextInputType.text
-                    : TextInputType.number,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: color,
-                ),
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-            )
-          else
-            Text(
-              value,
+        ),
+        const SizedBox(height: 4),
+        if (_isEditing)
+          SizedBox(
+            width: double.infinity,
+            child: TextField(
+              controller: controller,
+              keyboardType: isText ? TextInputType.text : TextInputType.number,
+              textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: color,
               ),
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.zero,
+              ),
             ),
-        ],
-      ),
+          )
+        else
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+            textAlign: TextAlign.center,
+          ),
+      ],
     );
   }
 
