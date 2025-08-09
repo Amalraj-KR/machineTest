@@ -169,6 +169,41 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
             pinned: true,
             backgroundColor: Colors.transparent,
             elevation: 0,
+            actions: [
+              Container(
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color:
+                      (_isEditing
+                              ? const Color(0xFF10B981)
+                              : const Color(0xFF3B82F6))
+                          .withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextButton.icon(
+                  onPressed: _toggleEditMode,
+                  icon: Icon(
+                    _isEditing ? Icons.save_rounded : Icons.edit_rounded,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                  label: Text(
+                    _isEditing ? 'Save' : 'Edit',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                  ),
+                ),
+              ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,
@@ -225,15 +260,83 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
             child: Column(
               children: [
                 Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatCard(
+                          icon: Icons.timer_outlined,
+                          title: 'Prep',
+                          value: '${_recipe!.prepTimeMinutes}m',
+                          color: const Color(0xFF10B981),
+                          controller: _prepTimeController,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildStatCard(
+                          icon: Icons.local_fire_department_outlined,
+                          title: 'Cook',
+                          value: '${_recipe!.cookTimeMinutes}m',
+                          color: const Color(0xFFFF6B6B),
+                          controller: _cookTimeController,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildStatCard(
+                          icon: Icons.people_outline_rounded,
+                          title: 'Serves',
+                          value: '${_recipe!.servings}',
+                          color: const Color(0xFF8B5CF6),
+                          controller: _servingsController,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildStatCard(
+                          icon: Icons.speed_rounded,
+                          title: 'Difficulty',
+                          value: _recipe!.difficulty,
+                          color: const Color(0xFF3B82F6),
+                          controller: _difficultyController,
+                          isText: true,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Container(
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (_isEditing)
-                        _customTextField(
-                          label: 'Recipe Name',
-                          controller: _nameController,
-                          icon: Icons.restaurant_menu_rounded,
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.grey.shade200),
+                          ),
+                          child: TextField(
+                            controller: _nameController,
+                            // keyboardType: keyboardType,
+                            style: Theme.of(context).textTheme.headlineMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF0F172A),
+                                ),
+                            decoration: InputDecoration(
+                              hintText: "Recipe Name",
+                              prefixIcon: Icon(
+                                Icons.restaurant_menu_rounded,
+                                color: const Color(0xFF3B82F6),
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.all(20),
+                            ),
+                          ),
                         )
                       else
                         Text(
@@ -247,7 +350,43 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          _buildRatingChip(_recipe!.rating),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFFFBBF24,
+                              ).withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: const Color(
+                                  0xFFFBBF24,
+                                ).withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.star_rounded,
+                                  color: Color(0xFFFBBF24),
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _recipe!.rating.toStringAsFixed(1),
+                                  style: const TextStyle(
+                                    color: Color(0xFFFBBF24),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
                           const SizedBox(width: 12),
                           _buildChip(
                             icon: Icons.schedule_rounded,
@@ -303,9 +442,105 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                         icon: Icons.label_outline_rounded,
                         color: const Color(0xFF10B981),
                         children: [
-                          _buildTagsSection(),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Tags',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: _recipe!.tags
+                                    .map(
+                                      (tag) => Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(
+                                            0xFF10B981,
+                                          ).withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                          border: Border.all(
+                                            color: const Color(
+                                              0xFF10B981,
+                                            ).withValues(alpha: 0.3),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          tag,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xFF10B981),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            ],
+                          ),
                           const SizedBox(height: 16),
-                          _buildMealTypesSection(),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Meal Types',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: _recipe!.mealType
+                                    .map(
+                                      (mealType) => Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(
+                                            0xFF8B5CF6,
+                                          ).withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                          border: Border.all(
+                                            color: const Color(
+                                              0xFF8B5CF6,
+                                            ).withValues(alpha: 0.3),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          mealType,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xFF8B5CF6),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                       _buildSectionCard(
@@ -342,126 +577,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                 ),
                 const SizedBox(height: 100),
               ],
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: _buildFloatingActionButton(context),
-    );
-  }
-
-  // Widget _buildQuickStats(BuildContext context) {
-  //   return Container(
-  //     margin: const EdgeInsets.symmetric(horizontal: 20),
-  //     child: Row(
-  //       children: [
-  //         Expanded(
-  //           child: _buildStatCard(
-  //             icon: Icons.timer_outlined,
-  //             title: 'Prep',
-  //             value: '${_recipe!.prepTimeMinutes}m',
-  //             color: const Color(0xFF10B981),
-  //             controller: _prepTimeController,
-  //           ),
-  //         ),
-  //         const SizedBox(width: 12),
-  //         Expanded(
-  //           child: _buildStatCard(
-  //             icon: Icons.local_fire_department_outlined,
-  //             title: 'Cook',
-  //             value: '${_recipe!.cookTimeMinutes}m',
-  //             color: const Color(0xFFFF6B6B),
-  //             controller: _cookTimeController,
-  //           ),
-  //         ),
-  //         const SizedBox(width: 12),
-  //         Expanded(
-  //           child: _buildStatCard(
-  //             icon: Icons.people_outline_rounded,
-  //             title: 'Serves',
-  //             value: '${_recipe!.servings}',
-  //             color: const Color(0xFF8B5CF6),
-  //             controller: _servingsController,
-  //           ),
-  //         ),
-  //         const SizedBox(width: 12),
-  //         Expanded(
-  //           child: _buildStatCard(
-  //             icon: Icons.speed_rounded,
-  //             title: 'Difficulty',
-  //             value: _recipe!.difficulty,
-  //             color: const Color(0xFF3B82F6),
-  //             controller: _difficultyController,
-  //             isText: true,
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  Widget _buildFloatingActionButton(BuildContext context) {
-    return FloatingActionButton.extended(
-      onPressed: _toggleEditMode,
-      backgroundColor: _isEditing
-          ? const Color(0xFF10B981)
-          : const Color(0xFF3B82F6),
-      foregroundColor: Colors.white,
-      icon: Icon(_isEditing ? Icons.save_rounded : Icons.edit_rounded),
-      label: Text(_isEditing ? 'Save Changes' : 'Edit Recipe'),
-    );
-  }
-
-  Widget _customTextField({
-    required String label,
-    required TextEditingController controller,
-    required IconData icon,
-    TextInputType? keyboardType,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: TextField(
-        controller: controller,
-        keyboardType: keyboardType,
-        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-          fontWeight: FontWeight.w700,
-          color: const Color(0xFF0F172A),
-        ),
-        decoration: InputDecoration(
-          hintText: label,
-          prefixIcon: Icon(icon, color: const Color(0xFF3B82F6)),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.all(20),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRatingChip(double rating) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFBBF24).withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFFFBBF24).withValues(alpha: 0.3),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.star_rounded, color: Color(0xFFFBBF24), size: 16),
-          const SizedBox(width: 4),
-          Text(
-            rating.toStringAsFixed(1),
-            style: const TextStyle(
-              color: Color(0xFFFBBF24),
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
             ),
           ),
         ],
@@ -692,98 +807,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     );
   }
 
-  Widget _buildTagsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Tags',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey.shade700,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: _recipe!.tags
-              .map(
-                (tag) => Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Text(
-                    tag,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF10B981),
-                    ),
-                  ),
-                ),
-              )
-              .toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMealTypesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Meal Types',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey.shade700,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: _recipe!.mealType
-              .map(
-                (mealType) => Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Text(
-                    mealType,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF8B5CF6),
-                    ),
-                  ),
-                ),
-              )
-              .toList(),
-        ),
-      ],
-    );
-  }
-
   Widget _buildListField({
     required TextEditingController controller,
     required List<String> items,
@@ -791,11 +814,245 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     bool isNumbered = false,
   }) {
     if (hintText?.contains('ingredient') == true) {
-      return _buildDynamicIngredientsList();
+      if (!_isEditing) {
+        return Column(
+          children: _recipe!.ingredients.asMap().entries.map((entry) {
+            final item = entry.value;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    margin: const EdgeInsets.only(right: 12, top: 8),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF3B82F6),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      item,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        );
+      }
+
+      return Column(
+        children: [
+          ..._ingredientControllers.asMap().entries.map((entry) {
+            final index = entry.key;
+            final controller = entry.value;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: controller,
+                      decoration: InputDecoration(
+                        hintText: 'Enter ingredient ${index + 1}',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        contentPadding: const EdgeInsets.all(16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  if (_ingredientControllers.length > 1)
+                    IconButton(
+                      onPressed: () => _removeIngredient(index),
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: Color(0xFFFF6B6B),
+                      ),
+                      style: IconButton.styleFrom(
+                        backgroundColor: const Color(
+                          0xFFFF6B6B,
+                        ).withValues(alpha: 0.1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          }),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _addIngredient,
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Add Ingredient'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
+                foregroundColor: const Color(0xFF8B5CF6),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
     }
 
     if (hintText?.contains('step') == true) {
-      return _buildDynamicInstructionsList();
+      if (!_isEditing) {
+        return Column(
+          children: _recipe!.instructions.asMap().entries.map((entry) {
+            final index = entry.key;
+            final item = entry.value;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 24,
+                    height: 24,
+                    margin: const EdgeInsets.only(right: 12),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF3B82F6),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${index + 1}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      item,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        );
+      }
+
+      return Column(
+        children: [
+          ..._instructionControllers.asMap().entries.map((entry) {
+            final index = entry.key;
+            final controller = entry.value;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 24,
+                    height: 24,
+                    margin: const EdgeInsets.only(right: 12, top: 12),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF3B82F6),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${index + 1}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: controller,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        hintText: 'Enter step ${index + 1}',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        contentPadding: const EdgeInsets.all(16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  if (_instructionControllers.length > 1)
+                    IconButton(
+                      onPressed: () => _removeInstruction(index),
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: Color(0xFFFF6B6B),
+                      ),
+                      style: IconButton.styleFrom(
+                        backgroundColor: const Color(
+                          0xFFFF6B6B,
+                        ).withValues(alpha: 0.1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          }),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _addInstruction,
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Add Instruction'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF6B6B).withValues(alpha: 0.1),
+                foregroundColor: const Color(0xFFFF6B6B),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
     }
 
     if (_isEditing) {
@@ -872,248 +1129,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
           ),
         );
       }).toList(),
-    );
-  }
-
-  Widget _buildDynamicIngredientsList() {
-    if (!_isEditing) {
-      return Column(
-        children: _recipe!.ingredients.asMap().entries.map((entry) {
-          final item = entry.value;
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 6,
-                  height: 6,
-                  margin: const EdgeInsets.only(right: 12, top: 8),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF3B82F6),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    item,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      height: 1.4,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      );
-    }
-
-    return Column(
-      children: [
-        ..._ingredientControllers.asMap().entries.map((entry) {
-          final index = entry.key;
-          final controller = entry.value;
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: controller,
-                    decoration: InputDecoration(
-                      hintText: 'Enter ingredient ${index + 1}',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey.shade200),
-                      ),
-                      contentPadding: const EdgeInsets.all(16),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                if (_ingredientControllers.length > 1)
-                  IconButton(
-                    onPressed: () => _removeIngredient(index),
-                    icon: const Icon(
-                      Icons.close_rounded,
-                      color: Color(0xFFFF6B6B),
-                    ),
-                    style: IconButton.styleFrom(
-                      backgroundColor: const Color(
-                        0xFFFF6B6B,
-                      ).withValues(alpha: 0.1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          );
-        }),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: _addIngredient,
-            icon: const Icon(Icons.add_rounded),
-            label: const Text('Add Ingredient'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
-              foregroundColor: const Color(0xFF8B5CF6),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDynamicInstructionsList() {
-    if (!_isEditing) {
-      return Column(
-        children: _recipe!.instructions.asMap().entries.map((entry) {
-          final index = entry.key;
-          final item = entry.value;
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 24,
-                  height: 24,
-                  margin: const EdgeInsets.only(right: 12),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF3B82F6),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${index + 1}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    item,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      height: 1.4,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      );
-    }
-
-    return Column(
-      children: [
-        ..._instructionControllers.asMap().entries.map((entry) {
-          final index = entry.key;
-          final controller = entry.value;
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 24,
-                  height: 24,
-                  margin: const EdgeInsets.only(right: 12, top: 12),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF3B82F6),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${index + 1}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: controller,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                      hintText: 'Enter step ${index + 1}',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey.shade200),
-                      ),
-                      contentPadding: const EdgeInsets.all(16),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                if (_instructionControllers.length > 1)
-                  IconButton(
-                    onPressed: () => _removeInstruction(index),
-                    icon: const Icon(
-                      Icons.close_rounded,
-                      color: Color(0xFFFF6B6B),
-                    ),
-                    style: IconButton.styleFrom(
-                      backgroundColor: const Color(
-                        0xFFFF6B6B,
-                      ).withValues(alpha: 0.1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          );
-        }),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: _addInstruction,
-            icon: const Icon(Icons.add_rounded),
-            label: const Text('Add Instruction'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF6B6B).withValues(alpha: 0.1),
-              foregroundColor: const Color(0xFFFF6B6B),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 

@@ -32,7 +32,6 @@ class ProfileScreen extends StatelessWidget {
             ),
           );
         }
-
         return SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -103,7 +102,6 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 32),
-
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(24),

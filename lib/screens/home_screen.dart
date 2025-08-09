@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:machine_test/models/navigation_model.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/battery_overlay.dart';
@@ -73,7 +74,65 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return BatteryOverlay(
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        appBar: _appBar(),
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.menu_rounded,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
+          ),
+          title: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: Text(
+              _navItems[_selectedIndex].title,
+              key: ValueKey(_selectedIndex),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+            ),
+          ),
+          centerTitle: true,
+          actions: [
+            Container(
+              margin: const EdgeInsets.only(right: 16),
+              child: IconButton(
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.notifications_outlined,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Notifications feature coming soon!'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
         drawer: Drawer(
           backgroundColor: Colors.white,
           elevation: 0,
@@ -85,7 +144,93 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           child: Column(
             children: [
-              _buildDrawerHeader(),
+              Consumer<AuthProvider>(
+                builder: (context, authProvider, child) {
+                  final user = authProvider.user;
+                  return Container(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF3B82F6),
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(24),
+                        bottomLeft: Radius.circular(32),
+                        bottomRight: Radius.circular(32),
+                      ),
+                    ),
+                    child: SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.1),
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: CircleAvatar(
+                                radius: 32,
+                                backgroundColor: Colors.grey.shade200,
+                                backgroundImage:
+                                    user?.image != null &&
+                                        user!.image.isNotEmpty
+                                    ? NetworkImage(user.image)
+                                    : null,
+                                child:
+                                    user?.image == null || user!.image.isEmpty
+                                    ? const Icon(
+                                        Icons.person_rounded,
+                                        size: 32,
+                                        color: Color(0xFF3B82F6),
+                                      )
+                                    : null,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              user != null
+                                  ? '${user.firstName} ${user.lastName}'
+                                  : 'User',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.5,
+                                shadows: [
+                                  Shadow(
+                                    offset: Offset(0, 1),
+                                    blurRadius: 4,
+                                    color: Colors.black26,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              user?.email ?? 'user@example.com',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.9),
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
               const SizedBox(height: 16),
               Expanded(
                 child: ListView.builder(
@@ -225,152 +370,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  PreferredSizeWidget _appBar() {
-    return AppBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      surfaceTintColor: Colors.transparent,
-      leading: Builder(
-        builder: (context) => IconButton(
-          icon: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(
-                context,
-              ).colorScheme.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              Icons.menu_rounded,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-          onPressed: () => Scaffold.of(context).openDrawer(),
-        ),
-      ),
-      title: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 200),
-        child: Text(
-          _navItems[_selectedIndex].title,
-          key: ValueKey(_selectedIndex),
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
-        ),
-      ),
-      centerTitle: true,
-      actions: [
-        Container(
-          margin: const EdgeInsets.only(right: 16),
-          child: IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.notifications_outlined,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Notifications feature coming soon!'),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDrawerHeader() {
-    return Consumer<AuthProvider>(
-      builder: (context, authProvider, child) {
-        final user = authProvider.user;
-        return Container(
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            color: Color(0xFF3B82F6),
-            borderRadius: BorderRadius.only(topRight: Radius.circular(24)),
-          ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 15,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: CircleAvatar(
-                      radius: 32,
-                      backgroundColor: Colors.grey.shade200,
-                      backgroundImage:
-                          user?.image != null && user!.image.isNotEmpty
-                          ? NetworkImage(user.image)
-                          : null,
-                      child: user?.image == null || user!.image.isEmpty
-                          ? const Icon(
-                              Icons.person_rounded,
-                              size: 32,
-                              color: Color(0xFF3B82F6),
-                            )
-                          : null,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    user != null
-                        ? '${user.firstName} ${user.lastName}'
-                        : 'User',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.5,
-                      shadows: [
-                        Shadow(
-                          offset: Offset(0, 1),
-                          blurRadius: 4,
-                          color: Colors.black26,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    user?.email ?? 'user@example.com',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Widget _drawerItem(int index) {
     final isSelected = _selectedIndex == index;
     final item = _navItems[index];
@@ -436,18 +435,4 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
     );
   }
-}
-
-class NavItem {
-  final IconData icon;
-  final IconData activeIcon;
-  final String label;
-  final String title;
-
-  NavItem({
-    required this.icon,
-    required this.activeIcon,
-    required this.label,
-    required this.title,
-  });
 }

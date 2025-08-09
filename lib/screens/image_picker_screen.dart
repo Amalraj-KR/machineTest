@@ -265,7 +265,6 @@ class ImagePickerScreen extends StatelessWidget {
                   ),
                 ),
               ],
-
               if (platformProvider.error != null) ...[
                 const SizedBox(height: 20),
                 Card(

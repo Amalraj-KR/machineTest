@@ -282,9 +282,7 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 32),
-
                     FadeTransition(
                       opacity: _fadeAnimation,
                       child: SlideTransition(
